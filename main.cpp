@@ -1,8 +1,11 @@
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include "TileMap.cpp"
 #include "json.hpp"
 #include <fstream>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#include <TGUI/TGUI.hpp>
+
+int TileType = 1;
 
 namespace ns{
 
@@ -47,13 +50,52 @@ void updateJson(ns::MapForJsonStruct ms) {
 
 }
 
+void updateText(int num) {
+    TileType = num;
+}
+
 int main()
 {
-    int TileType = 1;
 
     using nlohmann::json;
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "TileMap Maker V0.1", sf::Style::Close |  sf::Style::Resize);
+    tgui::Gui gui{window};
+
+    auto child = tgui::ChildWindow::create();
+    // child->setRenderer(theme.getRenderer("ChildWindow"));
+    child->setClientSize({120, 250});
+    child->setPosition(420, 80);
+    child->setTitle("Child window");
+    gui.add(child);
+
+    auto button = tgui::Button::create();
+    button->setPosition(0, 10);
+    button->setText("TILE 1");
+    button->setSize(100, 30);
+    button->onPress(&updateText, 0);
+    child->add(button);
+
+    auto button1 = tgui::Button::create();
+    button1->setPosition(0, 40);
+    button1->setText("TILE 2");
+    button1->setSize(100, 30);
+    button1->onPress(&updateText, 1);
+    child->add(button1);
+
+    auto button2 = tgui::Button::create();
+    button2->setPosition(0, 70);
+    button2->setText("TILE 3");
+    button2->setSize(100, 30);
+    button2->onPress(&updateText, 2);
+    child->add(button2);
+
+    auto button3 = tgui::Button::create();
+    button3->setPosition(0, 100);
+    button3->setText("TILE 4");
+    button3->setSize(100, 30);
+    button3->onPress(&updateText, 3);
+    child->add(button3);
 
     std::ifstream file ("map.json");
 
@@ -73,6 +115,8 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
+            gui.handleEvent(event);
+
             switch (event.type)
             {
 
@@ -121,9 +165,9 @@ int main()
 
         window.clear();
         window.draw(map);
+        gui.draw();
         window.display();
     }
 
     return 0;
 }
-
